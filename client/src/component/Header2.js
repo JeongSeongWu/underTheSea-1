@@ -274,7 +274,7 @@ function Header2() {
         </Link>
         <Link
           style={{ textDecoration: "none", color: "black" }}
-          to="/nearbyaquarium"
+          to="/aquasearch"
         >
           <Aquarium>수족관</Aquarium>
         </Link>

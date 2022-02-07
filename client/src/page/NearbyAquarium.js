@@ -15,47 +15,79 @@ const Container = styled.div`
 const MapContainer = styled.div`
   width: 100vw;
   height: 100vh;
-  border: 1px solid red;
   position: relative;
 `;
 
-const Input = styled.input``;
-
-const Button = styled.button``;
-
-const SearchContainer = styled.div`
-  position: absolute;
-  top: 1%;
-  left: 1%;
-  width: 15%;
-  height: 40px;
-  border: 1px solid red;
-  background: red;
-  z-index: 99;
+const Input = styled.input`
+  width: 80%;
+  height: 100%;
+  padding: 5px;
+  box-sizing: border-box;
 `;
 
-function NearbyAquarium() {
-  const options = {
-    //지도를 생성할 때 필요한 기본 옵션
-    center: new window.kakao.maps.LatLng(33.450701, 126.570667), //지도의 중심좌표.
-    level: 3, //지도의 레벨(확대, 축소 정도)
-  };
-  const container = useRef(null); //지도를 담을 영역의 DOM 레퍼런스
+const Button = styled.button`
+  width: 20%;
+  height: 100%;
+`;
 
+const SearchContainer = styled.form`
+  display: flex;
+  position: absolute;
+  top: 2%;
+  left: 1%;
+  width: 20%;
+  height: 40px;
+  z-index: 99;
+`;
+const { kakao } = window;
+
+function NearbyAquarium({ searchPlace }) {
   useEffect(() => {
-    new window.kakao.maps.Map(container.current, options); //지도 생성 및 객체 리턴
-    return () => {};
-  }, []);
+    console.log("유즈이펙트는 실행되니?");
+    var infowindow = new kakao.maps.InfoWindow({ zIndex: 999 });
+    const container = document.getElementById("myMap");
+    const options = {
+      center: new kakao.maps.LatLng(33.450701, 126.570667),
+      level: 3,
+    };
+    const map = new kakao.maps.Map(container, options);
 
-  return (
-    <Container>
-      <Header2 />
+    const ps = new kakao.maps.services.Places();
 
-      <MapContainer className="map" ref={container}>
-        <SearchContainer></SearchContainer>
-      </MapContainer>
-      <Footer />
-    </Container>
-  );
+    ps.keywordSearch(searchPlace, placesSearchCB);
+
+    function placesSearchCB(data, status, pagination) {
+      if (status === kakao.maps.services.Status.OK) {
+        let bounds = new kakao.maps.LatLngBounds();
+
+        for (let i = 0; i < data.length; i++) {
+          displayMarker(data[i]);
+          bounds.extend(new kakao.maps.LatLng(data[i].y, data[i].x));
+        }
+
+        map.setBounds(bounds);
+      }
+    }
+
+    function displayMarker(place) {
+      let marker = new kakao.maps.Marker({
+        map: map,
+        position: new kakao.maps.LatLng(place.y, place.x),
+      });
+
+      // 마커에 클릭이벤트를 등록합니다
+      kakao.maps.event.addListener(marker, "click", function () {
+        // 마커를 클릭하면 장소명이 인포윈도우에 표출됩니다
+        infowindow.setContent(
+          '<div style="padding:5px;font-size:12px;">' +
+            place.place_name +
+            "</div>"
+        );
+        infowindow.open(map, marker);
+      });
+    }
+  }, [searchPlace]);
+
+  return <MapContainer id="myMap"></MapContainer>;
 }
 export default NearbyAquarium;
