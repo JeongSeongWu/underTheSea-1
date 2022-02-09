@@ -18,6 +18,7 @@ import SignUp from "./modalComponent/SignUp";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { loginAction, loginModalOnAction } from "./store/actions";
+import NearbyAquarium from "./page/NearbyAquarium";
 
 function App() {
   const state = useSelector((state) => state.modalReducer);
@@ -190,6 +191,7 @@ function App() {
         <Route path="/search" element={<Search />}></Route>
         <Route path="/writetips" element={<WriteTips token={token} />}></Route>
         <Route path="/posttips/:tip_id" element={<PostTips />}></Route>
+        <Route path="/nearbyaquarium" element={<NearbyAquarium />}></Route>
         <Route
           path="/manage"
           element={
